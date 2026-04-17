@@ -75,9 +75,9 @@ export default function BookingPage() {
           <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mx-auto mb-5">
             <CheckCircle2 size={32} className="text-emerald-600 dark:text-emerald-400" />
           </div>
-          <h1 className="font-display text-2xl font-bold text-slate-900 dark:text-white mb-2">Booking Confirmed!</h1>
+          <h1 className="font-display text-2xl font-bold text-slate-900 dark:text-white mb-2">Booking Confirmed! 🇰🇪</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
-            Your reservation has been successfully created. Check your email for confirmation details.
+            Your reservation has been successfully created. Asante sana for choosing TembeaKenya!
           </p>
 
           <div className="bg-slate-50 dark:bg-slate-700/30 rounded-2xl p-4 mb-6 text-left space-y-2.5 text-sm">
@@ -94,8 +94,8 @@ export default function BookingPage() {
           </div>
 
           <div className="flex gap-3">
-            <Button variant="secondary" className="flex-1" onClick={() => navigate('/hotels')}>Browse More</Button>
-            <Button className="flex-1" onClick={() => navigate('/dashboard')}>My Bookings</Button>
+            <Button variant="secondary" className="flex-1" onClick={() => navigate('/hotels')} id="browse-more-btn">Browse More</Button>
+            <Button className="flex-1" onClick={() => navigate('/dashboard')} id="my-bookings-btn">My Bookings</Button>
           </div>
         </div>
       </div>
@@ -106,7 +106,7 @@ export default function BookingPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900/30 page-enter">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 mb-6 transition-colors">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 mb-6 transition-colors" id="booking-back-btn">
           <ChevronLeft size={16} /> Back to hotel
         </button>
 
@@ -119,10 +119,10 @@ export default function BookingPage() {
             <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6">
               <h2 className="font-display font-semibold text-slate-900 dark:text-white mb-5">Guest Information</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input label="First Name *" value={form.firstName} onChange={set('firstName')} error={errors.firstName} placeholder="John" />
-                <Input label="Last Name *"  value={form.lastName}  onChange={set('lastName')}  error={errors.lastName}  placeholder="Smith" />
-                <Input label="Email *" type="email" value={form.email} onChange={set('email')} error={errors.email} placeholder="john@example.com" />
-                <Input label="Phone" type="tel" value={form.phone} onChange={set('phone')} placeholder="+1 (555) 000-0000" />
+                <Input label="First Name *" value={form.firstName} onChange={set('firstName')} error={errors.firstName} placeholder="John" id="booking-firstname" />
+                <Input label="Last Name *"  value={form.lastName}  onChange={set('lastName')}  error={errors.lastName}  placeholder="Kamau" id="booking-lastname" />
+                <Input label="Email *" type="email" value={form.email} onChange={set('email')} error={errors.email} placeholder="john@example.com" id="booking-email" />
+                <Input label="Phone" type="tel" value={form.phone} onChange={set('phone')} placeholder="+254 7XX XXX XXX" id="booking-phone" />
               </div>
               <div className="mt-4">
                 <Textarea
@@ -131,6 +131,7 @@ export default function BookingPage() {
                   onChange={set('specialRequests')}
                   placeholder="Early check-in, dietary requirements, accessibility needs, room preferences..."
                   rows={3}
+                  id="booking-requests"
                 />
               </div>
             </div>
@@ -138,18 +139,18 @@ export default function BookingPage() {
             {/* Payment placeholder */}
             <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6">
               <h2 className="font-display font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                <CreditCard size={18} className="text-gold-500" />
+                <CreditCard size={18} className="text-emerald-500" />
                 Payment Method
               </h2>
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
                 Payment is processed securely at the hotel. This booking creates a reservation.
               </p>
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-3 text-sm text-blue-700 dark:text-blue-400">
-                💳 Pay at hotel — No charges made now. Your card details are not required to complete this reservation.
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400">
+                💳 Pay at hotel — No charges made now. M-PESA and card payments accepted at check-in.
               </div>
             </div>
 
-            <Button type="submit" size="xl" className="w-full" loading={loading}>
+            <Button type="submit" size="xl" className="w-full" loading={loading} id="confirm-booking-btn">
               Confirm Reservation — {formatCurrency(total)}
             </Button>
 
@@ -180,7 +181,7 @@ export default function BookingPage() {
                   </div>
                   <div className="flex justify-between font-bold text-slate-900 dark:text-white text-base border-t border-slate-100 dark:border-slate-700 pt-2">
                     <span>Total</span>
-                    <span className="text-gold-600 dark:text-gold-400">{formatCurrency(total)}</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">{formatCurrency(total)}</span>
                   </div>
                 </div>
                 <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl px-3 py-2 text-xs text-emerald-700 dark:text-emerald-400">
@@ -207,7 +208,7 @@ function Row({ label, value, bold, mono }) {
 function SummaryRow({ icon: Icon, label, value }) {
   return (
     <div className="flex items-center gap-3">
-      <Icon size={15} className="text-gold-500 shrink-0" />
+      <Icon size={15} className="text-emerald-500 shrink-0" />
       <div className="flex-1 flex justify-between text-sm">
         <span className="text-slate-500 dark:text-slate-400">{label}</span>
         <span className="font-medium text-slate-800 dark:text-slate-200">{value}</span>

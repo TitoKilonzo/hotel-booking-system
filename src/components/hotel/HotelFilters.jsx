@@ -17,12 +17,12 @@ export default function HotelFilters({ filters, onChange, locations = [] }) {
 
   const clearAll = () => {
     setLocalSearch('')
-    onChange({ search: '', location: '', minPrice: 0, maxPrice: 2000, amenities: [] })
+    onChange({ search: '', location: '', minPrice: 0, maxPrice: 50000, amenities: [] })
   }
 
   const hasFilters =
     filters.search || filters.location || (filters.amenities?.length > 0) ||
-    filters.minPrice > 0 || filters.maxPrice < 2000
+    filters.minPrice > 0 || filters.maxPrice < 50000
 
   return (
     <div>
@@ -37,6 +37,7 @@ export default function HotelFilters({ filters, onChange, locations = [] }) {
           onKeyDown={e => e.key === 'Enter' && update('search', localSearch)}
           onBlur={() => update('search', localSearch)}
           className="w-full pl-9 pr-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 transition-all"
+          id="filter-search-input"
         />
       </div>
 
@@ -48,11 +49,12 @@ export default function HotelFilters({ filters, onChange, locations = [] }) {
           icon={SlidersHorizontal}
           onClick={() => setOpen(o => !o)}
           className="lg:hidden"
+          id="filters-toggle-btn"
         >
-          Filters {hasFilters && <span className="ml-1 w-4 h-4 rounded-full bg-gold-500 text-white text-xs flex items-center justify-center">{[filters.location, ...(filters.amenities||[])].filter(Boolean).length}</span>}
+          Filters {hasFilters && <span className="ml-1 w-4 h-4 rounded-full bg-emerald-500 text-white text-xs flex items-center justify-center">{[filters.location, ...(filters.amenities||[])].filter(Boolean).length}</span>}
         </Button>
         {hasFilters && (
-          <button onClick={clearAll} className="text-xs text-red-500 hover:text-red-600 flex items-center gap-1 ml-auto">
+          <button onClick={clearAll} className="text-xs text-red-500 hover:text-red-600 flex items-center gap-1 ml-auto" id="clear-all-filters">
             <X size={12} /> Clear all
           </button>
         )}
@@ -70,9 +72,10 @@ export default function HotelFilters({ filters, onChange, locations = [] }) {
               className={cn(
                 'w-full text-left px-3 py-2 rounded-lg text-sm transition-colors',
                 !filters.location
-                  ? 'bg-gold-50 text-gold-700 dark:bg-gold-900/20 dark:text-gold-400 font-medium'
+                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 font-medium'
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
               )}
+              id="filter-all-locations"
             >
               All Locations
             </button>
@@ -83,9 +86,10 @@ export default function HotelFilters({ filters, onChange, locations = [] }) {
                 className={cn(
                   'w-full text-left px-3 py-2 rounded-lg text-sm transition-colors',
                   filters.location === loc
-                    ? 'bg-gold-50 text-gold-700 dark:bg-gold-900/20 dark:text-gold-400 font-medium'
+                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 font-medium'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
                 )}
+                id={`filter-loc-${loc.toLowerCase().replace(/\s/g, '-')}`}
               >
                 {loc}
               </button>
@@ -96,26 +100,28 @@ export default function HotelFilters({ filters, onChange, locations = [] }) {
         {/* Price range */}
         <div>
           <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
-            Price per night
-            <span className="font-normal text-slate-400 ml-2">${filters.minPrice} – ${filters.maxPrice === 2000 ? '2000+' : filters.maxPrice}</span>
+            Price per night (KES)
+            <span className="font-normal text-slate-400 ml-2">{filters.minPrice?.toLocaleString()} – {filters.maxPrice >= 50000 ? '50,000+' : filters.maxPrice?.toLocaleString()}</span>
           </h4>
           <div className="space-y-3">
             <div>
               <label className="text-xs text-slate-400 mb-1 block">Min price</label>
               <input
-                type="range" min={0} max={1000} step={50}
+                type="range" min={0} max={30000} step={1000}
                 value={filters.minPrice || 0}
                 onChange={e => update('minPrice', Number(e.target.value))}
-                className="w-full accent-gold-500"
+                className="w-full accent-emerald-500"
+                id="filter-min-price"
               />
             </div>
             <div>
               <label className="text-xs text-slate-400 mb-1 block">Max price</label>
               <input
-                type="range" min={100} max={2000} step={100}
-                value={filters.maxPrice || 2000}
+                type="range" min={5000} max={50000} step={5000}
+                value={filters.maxPrice || 50000}
                 onChange={e => update('maxPrice', Number(e.target.value))}
-                className="w-full accent-gold-500"
+                className="w-full accent-emerald-500"
+                id="filter-max-price"
               />
             </div>
           </div>
@@ -134,9 +140,10 @@ export default function HotelFilters({ filters, onChange, locations = [] }) {
                   className={cn(
                     'text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors border',
                     active
-                      ? 'bg-gold-500 text-white border-gold-500'
-                      : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-600 hover:border-gold-300'
+                      ? 'bg-emerald-500 text-white border-emerald-500'
+                      : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-600 hover:border-emerald-300'
                   )}
+                  id={`filter-amenity-${a.toLowerCase().replace(/\s/g, '-')}`}
                 >
                   {a}
                 </button>

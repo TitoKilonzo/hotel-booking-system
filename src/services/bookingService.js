@@ -13,11 +13,24 @@ export const bookingService = {
     const available = await roomService.checkAvailability(roomId, checkInDate, checkOutDate)
     if (!available) throw new Error('Room is not available for selected dates.')
 
-    // 2. Get room to calculate price
-    const room = await databases.getDocument(DB_ID, ROOMS_COL, roomId)
     const nights = differenceInDays(new Date(checkOutDate), new Date(checkInDate))
     if (nights < 1) throw new Error('Check-out must be after check-in.')
 
+    // Mock booking handling
+    if (roomId.startsWith('mock-')) {
+      const room = await roomService.getRoom(roomId)
+      const totalPrice = nights * room.pricePerNight
+      return {
+        booking: { $id: `mock-booking-${Date.now()}`, roomId, hotelId, userId, checkInDate, checkOutDate, nights, totalPrice, status: BOOKING_STATUS.PENDING },
+        room,
+        totalPrice,
+        nights
+      }
+    }
+
+    // 2. Get room to calculate price
+    const room = await databases.getDocument(DB_ID, ROOMS_COL, roomId)
+    
     const totalPrice = nights * room.pricePerNight
 
     // 3. Create booking document

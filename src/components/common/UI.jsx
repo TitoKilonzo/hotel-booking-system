@@ -2,15 +2,15 @@ import { cn } from '../../utils'
 import { X, Loader2 } from 'lucide-react'
 
 // ─── Button ───────────────────────────────────────────────────────────────────
-export function Button({ variant = 'primary', size = 'md', loading, icon: Icon, iconRight, children, className, disabled, ...props }) {
-  const base = 'inline-flex items-center justify-center gap-2 font-body font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gold-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none'
+export function Button({ variant = 'primary', size = 'md', loading, icon: Icon, iconRight: IconRight, children, className, disabled, ...props }) {
+  const base = 'inline-flex items-center justify-center gap-2 font-body font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none'
 
   const variants = {
-    primary:   'bg-gold-500 hover:bg-gold-600 text-white shadow-md hover:shadow-lg active:scale-[0.98]',
+    primary:   'bg-emerald-500 hover:bg-emerald-600 text-white shadow-md hover:shadow-lg active:scale-[0.98]',
     secondary: 'bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-white',
     ghost:     'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300',
     danger:    'bg-red-500 hover:bg-red-600 text-white shadow-md',
-    outline:   'border-2 border-gold-500 text-gold-600 hover:bg-gold-500 hover:text-white dark:text-gold-400',
+    outline:   'border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-500 hover:text-white dark:text-emerald-400',
   }
 
   const sizes = {
@@ -29,7 +29,7 @@ export function Button({ variant = 'primary', size = 'md', loading, icon: Icon, 
     >
       {loading ? <Loader2 size={16} className="animate-spin" /> : Icon && <Icon size={size === 'sm' ? 14 : 16} />}
       {children}
-      {iconRight && <iconRight size={16} />}
+      {IconRight && <IconRight size={16} />}
     </button>
   )
 }
@@ -121,7 +121,7 @@ export function Badge({ variant = 'default', children, className }) {
 export function Spinner({ size = 24, className }) {
   return (
     <div className={cn('flex items-center justify-center', className)}>
-      <Loader2 size={size} className="animate-spin text-gold-500" />
+      <Loader2 size={size} className="animate-spin text-emerald-500" />
     </div>
   )
 }

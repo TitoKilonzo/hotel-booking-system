@@ -15,8 +15,12 @@ export function AuthProvider({ children }) {
       const u = await authService.getCurrentUser()
       if (u) {
         setUser(u)
-        const p = await authService.getUserProfile(u.$id)
+        // Use ensureUserProfile to handle both regular and OAuth users
+        const p = await authService.ensureUserProfile(u)
         setProfile(p)
+      } else {
+        setUser(null)
+        setProfile(null)
       }
     } catch {
       setUser(null)
@@ -38,7 +42,7 @@ export function AuthProvider({ children }) {
     try {
       await authService.register(data)
       await loadUser()
-      toast.success('Welcome to LuxeStay!')
+      toast.success('Karibu TembeaKenya! 🇰🇪')
     } catch (err) {
       toast.error(err.message || 'Registration failed')
       throw err
@@ -49,10 +53,18 @@ export function AuthProvider({ children }) {
     try {
       await authService.login(email, password)
       await loadUser()
-      toast.success('Welcome back!')
+      toast.success('Welcome back! 🇰🇪')
     } catch (err) {
       toast.error(err.message || 'Login failed')
       throw err
+    }
+  }
+
+  const loginWithGoogle = () => {
+    try {
+      authService.loginWithGoogle()
+    } catch (err) {
+      toast.error('Google login failed. Please try again.')
     }
   }
 
@@ -83,7 +95,7 @@ export function AuthProvider({ children }) {
   const isAdmin = authService.isAdmin(profile)
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, isAdmin, register, login, logout, updateProfile, reload: loadUser }}>
+    <AuthContext.Provider value={{ user, profile, loading, isAdmin, register, login, loginWithGoogle, logout, updateProfile, reload: loadUser }}>
       {children}
     </AuthContext.Provider>
   )

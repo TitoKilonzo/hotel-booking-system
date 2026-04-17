@@ -13,12 +13,13 @@ const AMENITY_ICONS = {
 export default function HotelCard({ hotel, className }) {
   const imageUrl = hotel.imageIds?.[0]
     ? hotelService.getImageUrl(hotel.imageIds[0], 600, 400)
-    : null
+    : hotel.imageUrl || null
 
   return (
     <Link
       to={`/hotels/${hotel.$id}`}
       className={`group block bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700 shadow-card dark:shadow-card-dark card-hover ${className || ''}`}
+      id={`hotel-card-${hotel.$id}`}
     >
       {/* Image */}
       <div className="relative h-52 overflow-hidden bg-slate-100 dark:bg-slate-700">
@@ -30,7 +31,7 @@ export default function HotelCard({ hotel, className }) {
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-slate-700 dark:to-slate-600">
             <span className="text-4xl">🏨</span>
           </div>
         )}
@@ -54,7 +55,7 @@ export default function HotelCard({ hotel, className }) {
       {/* Content */}
       <div className="p-5">
         <div className="flex items-start justify-between gap-2 mb-1.5">
-          <h3 className="font-display font-semibold text-slate-900 dark:text-white text-lg leading-tight group-hover:text-gold-600 dark:group-hover:text-gold-400 transition-colors line-clamp-1">
+          <h3 className="font-display font-semibold text-slate-900 dark:text-white text-lg leading-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-1">
             {hotel.name}
           </h3>
         </div>
@@ -91,13 +92,13 @@ export default function HotelCard({ hotel, className }) {
           <div>
             <span className="text-xs text-slate-400 dark:text-slate-500">Starting from</span>
             <div className="flex items-baseline gap-1">
-              <span className="text-lg font-bold text-gold-600 dark:text-gold-400">
+              <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                 {formatCurrency(hotel.startingPrice || 0)}
               </span>
               <span className="text-xs text-slate-400">/night</span>
             </div>
           </div>
-          <span className="text-xs font-medium text-gold-600 dark:text-gold-400 group-hover:underline">
+          <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 group-hover:underline">
             View Details →
           </span>
         </div>

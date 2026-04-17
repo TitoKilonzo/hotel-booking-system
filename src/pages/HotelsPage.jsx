@@ -16,7 +16,7 @@ export default function HotelsPage() {
     search:   searchParams.get('search') || '',
     location: searchParams.get('location') || '',
     minPrice: 0,
-    maxPrice: 2000,
+    maxPrice: 50000,
     amenities: [],
   })
   const [hotels, setHotels]       = useState([])
@@ -29,7 +29,7 @@ export default function HotelsPage() {
 
   // Load locations for filter sidebar
   useEffect(() => {
-    hotelService.getLocations().then(setLocations)
+    hotelService.getLocations().then(setLocations).catch(() => {})
   }, [])
 
   // Reload hotels when filters/page change
@@ -64,11 +64,11 @@ export default function HotelsPage() {
       {/* Page header */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="font-display text-3xl font-bold text-slate-900 dark:text-white mb-1">
-            Discover Hotels
+          <h1 className="font-display text-3xl font-bold text-slate-900 dark:text-white mb-1" id="hotels-page-title">
+            Discover Hotels in Kenya 🇰🇪
           </h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm">
-            {loading ? '...' : `${total.toLocaleString()} properties found`}
+            {loading ? 'Searching...' : `${total.toLocaleString()} properties found across Kenya`}
           </p>
         </div>
       </div>
@@ -104,7 +104,7 @@ export default function HotelsPage() {
                 title="No hotels found"
                 message="Try adjusting your filters or search terms to find more options."
                 action={
-                  <Button variant="secondary" onClick={() => setFilters({ search: '', location: '', minPrice: 0, maxPrice: 2000, amenities: [] })}>
+                  <Button variant="secondary" onClick={() => setFilters({ search: '', location: '', minPrice: 0, maxPrice: 50000, amenities: [] })} id="clear-filters-btn">
                     Clear Filters
                   </Button>
                 }
@@ -118,7 +118,7 @@ export default function HotelsPage() {
                 {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="flex items-center justify-center gap-3 mt-10">
-                    <Button variant="secondary" size="icon" disabled={page === 1} onClick={() => setPage(p => p - 1)}>
+                    <Button variant="secondary" size="icon" disabled={page === 1} onClick={() => setPage(p => p - 1)} id="prev-page-btn">
                       <ChevronLeft size={18} />
                     </Button>
                     <div className="flex gap-1">
@@ -128,15 +128,16 @@ export default function HotelsPage() {
                           onClick={() => setPage(p)}
                           className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
                             p === page
-                              ? 'bg-gold-500 text-white'
+                              ? 'bg-emerald-500 text-white'
                               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
                           }`}
+                          id={`page-${p}`}
                         >
                           {p}
                         </button>
                       ))}
                     </div>
-                    <Button variant="secondary" size="icon" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>
+                    <Button variant="secondary" size="icon" disabled={page === totalPages} onClick={() => setPage(p => p + 1)} id="next-page-btn">
                       <ChevronRight size={18} />
                     </Button>
                   </div>

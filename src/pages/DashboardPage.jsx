@@ -25,6 +25,7 @@ export default function DashboardPage() {
 
   const { data, loading } = useAsync(
     async () => {
+      if (!user?.$id) return []
       const { documents: bookings } = await bookingService.getUserBookings(user.$id)
       // Enrich with hotel and room names
       const enriched = await Promise.all(bookings.map(async b => {
@@ -40,7 +41,7 @@ export default function DashboardPage() {
       }))
       return enriched
     },
-    [user.$id, refreshKey]
+    [user?.$id, refreshKey]
   )
 
   const filtered = data?.filter(b => {
@@ -66,10 +67,10 @@ export default function DashboardPage() {
               My Dashboard
             </h1>
             <p className="text-slate-500 dark:text-slate-400 mt-1">
-              Welcome back, <span className="font-medium text-slate-700 dark:text-slate-300">{profile?.name}</span>
+              Karibu, <span className="font-medium text-slate-700 dark:text-slate-300">{profile?.name}</span> 🇰🇪
             </p>
           </div>
-          <Button onClick={() => navigate('/hotels')} iconRight={ChevronRight} size="sm">
+          <Button onClick={() => navigate('/hotels')} iconRight={ChevronRight} size="sm" id="dash-book-stay-btn">
             Book a Stay
           </Button>
         </div>
@@ -85,8 +86,8 @@ export default function DashboardPage() {
                 { label: 'Completed',      value: data?.filter(b => b.status === 'completed').length || 0, icon: User },
               ].map(({ label, value, icon: Icon }) => (
                 <div key={label} className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-4 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gold-50 dark:bg-gold-900/20 flex items-center justify-center shrink-0">
-                    <Icon size={18} className="text-gold-600 dark:text-gold-400" />
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0">
+                    <Icon size={18} className="text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <div>
                     <div className="text-xl font-bold text-slate-900 dark:text-white">{value}</div>
@@ -98,7 +99,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 mb-6 w-fit">
+        <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 mb-6 w-fit overflow-x-auto">
           {TABS.map(t => (
             <button
               key={t.id}
@@ -108,10 +109,11 @@ export default function DashboardPage() {
                   ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
               }`}
+              id={`tab-${t.id}`}
             >
               {t.label}
               {!loading && counts[t.id] > 0 && (
-                <span className={`text-xs rounded-full px-1.5 py-0.5 ${tab === t.id ? 'bg-gold-100 text-gold-700 dark:bg-gold-900/30 dark:text-gold-400' : 'bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-300'}`}>
+                <span className={`text-xs rounded-full px-1.5 py-0.5 ${tab === t.id ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-300'}`}>
                   {counts[t.id]}
                 </span>
               )}
@@ -128,8 +130,8 @@ export default function DashboardPage() {
           <EmptyState
             icon={CalendarDays}
             title="No bookings found"
-            message={tab === 'all' ? "You haven't made any bookings yet. Start exploring our hotels!" : `No ${tab} bookings.`}
-            action={<Button onClick={() => navigate('/hotels')}>Explore Hotels</Button>}
+            message={tab === 'all' ? "You haven't made any bookings yet. Start exploring Kenya's finest hotels!" : `No ${tab} bookings.`}
+            action={<Button onClick={() => navigate('/hotels')} id="explore-hotels-btn">Explore Hotels</Button>}
           />
         ) : (
           <div className="space-y-4">

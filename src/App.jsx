@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
@@ -24,6 +24,26 @@ function Layout({ children }) {
       <main className="flex-1">{children}</main>
       <Footer />
     </div>
+  )
+}
+
+// 404 page
+function NotFoundPage() {
+  return (
+    <Layout>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4 page-enter">
+        <span className="text-7xl mb-6">🏔️</span>
+        <h1 className="font-display text-4xl font-bold text-slate-900 dark:text-white mb-3">
+          Page Not Found
+        </h1>
+        <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-md">
+          Looks like you've wandered off the trail! Let's get you back to discovering Kenya's finest stays.
+        </p>
+        <a href="/" className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl px-6 py-3 transition-colors">
+          ← Back to Home
+        </a>
+      </div>
+    </Layout>
   )
 }
 
@@ -65,6 +85,9 @@ export default function App() {
                 <Layout><AdminDashboard /></Layout>
               </AdminRoute>
             } />
+
+            {/* 404 catch-all */}
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
 
           <Toaster
@@ -72,7 +95,7 @@ export default function App() {
             toastOptions={{
               className: 'font-body text-sm',
               style: { borderRadius: '12px', boxShadow: '0 4px 24px rgba(0,0,0,0.12)' },
-              success: { iconTheme: { primary: '#f59e0b', secondary: '#fff' } },
+              success: { iconTheme: { primary: '#10b981', secondary: '#fff' } },
             }}
           />
         </BrowserRouter>

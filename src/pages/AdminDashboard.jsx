@@ -3,12 +3,12 @@ import { useAsync } from '../hooks'
 import { hotelService } from '../services/hotelService'
 import { roomService } from '../services/roomService'
 import { bookingService } from '../services/bookingService'
-import { databases, DB_ID, USERS_COL, Query } from '../config/appwrite'
+import { databases, DB_ID, USERS_COL, HOTELS_COL, ROOMS_COL, Query } from '../config/appwrite'
 import { Button, Skeleton, Modal, EmptyState } from '../components/common/UI'
 import HotelFormModal from '../components/admin/HotelFormModal'
 import RoomFormModal from '../components/admin/RoomFormModal'
 import BookingStatusBadge from '../components/booking/BookingStatusBadge'
-import { Hotel, BedDouble, CalendarCheck, Users, Plus, Pencil, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
+import { Hotel, BedDouble, CalendarCheck, Users, Plus, Pencil, Trash2, Mail, Phone } from 'lucide-react'
 import { formatCurrency, formatDate } from '../utils'
 import toast from 'react-hot-toast'
 
@@ -31,23 +31,23 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="font-display text-3xl font-bold text-slate-900 dark:text-white">Admin Dashboard</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Manage hotels, rooms, and reservations</p>
+          <h1 className="font-display text-3xl font-bold text-slate-900 dark:text-white">Admin Dashboard 🇰🇪</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Manage hotels, rooms, and reservations across Kenya</p>
         </div>
 
         {/* Stat cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Total Hotels',   value: stats?.hotels,    icon: Hotel,         color: 'blue' },
-            { label: 'Total Users',    value: stats?.users,     icon: Users,         color: 'purple' },
-            { label: 'Total Bookings', value: stats?.total,     icon: CalendarCheck, color: 'gold' },
-            { label: 'Pending',        value: stats?.pending,   icon: BedDouble,     color: 'amber' },
-          ].map(({ label, value, icon: Icon, color }) => (
+            { label: 'Total Hotels',   value: stats?.hotels,    icon: Hotel,         bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-600 dark:text-emerald-400' },
+            { label: 'Total Users',    value: stats?.users,     icon: Users,         bg: 'bg-purple-50 dark:bg-purple-900/20', text: 'text-purple-600 dark:text-purple-400' },
+            { label: 'Total Bookings', value: stats?.total,     icon: CalendarCheck, bg: 'bg-gold-50 dark:bg-gold-900/20', text: 'text-gold-600 dark:text-gold-400' },
+            { label: 'Pending',        value: stats?.pending,   icon: BedDouble,     bg: 'bg-amber-50 dark:bg-amber-900/20', text: 'text-amber-600 dark:text-amber-400' },
+          ].map(({ label, value, icon: Icon, bg, text }) => (
             <div key={label} className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-5">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm text-slate-500 dark:text-slate-400">{label}</span>
-                <div className={`w-8 h-8 rounded-lg bg-${color}-50 dark:bg-${color}-900/20 flex items-center justify-center`}>
-                  <Icon size={16} className={`text-${color}-600 dark:text-${color}-400`} />
+                <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center`}>
+                  <Icon size={16} className={text} />
                 </div>
               </div>
               {statsLoading
@@ -69,6 +69,7 @@ export default function AdminDashboard() {
                   ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
               }`}
+              id={`admin-tab-${t}`}
             >
               {t}
             </button>
@@ -122,39 +123,41 @@ function HotelsTab({ refreshKey, refresh }) {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Hotels ({data?.total ?? 0})</h2>
-        <Button icon={Plus} size="sm" onClick={() => setShowAdd(true)}>Add Hotel</Button>
+        <Button icon={Plus} size="sm" onClick={() => setShowAdd(true)} id="add-hotel-btn">Add Hotel</Button>
       </div>
 
       {loading ? <Skeleton className="h-64 rounded-2xl" /> : (
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden">
           {data?.documents.length === 0 ? (
-            <EmptyState icon={Hotel} title="No hotels yet" message="Add your first hotel." />
+            <EmptyState icon={Hotel} title="No hotels yet" message="Add your first Kenyan hotel." />
           ) : (
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50 dark:bg-slate-700/50 text-xs text-slate-500 dark:text-slate-400 uppercase">
-                <tr>
-                  {['Name', 'Location', 'Category', 'Price', 'Actions'].map(h => (
-                    <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-                {data.documents.map(hotel => (
-                  <tr key={hotel.$id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
-                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{hotel.name}</td>
-                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{hotel.location}</td>
-                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{hotel.category}</td>
-                    <td className="px-4 py-3 font-medium text-gold-600 dark:text-gold-400">{formatCurrency(hotel.startingPrice)}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-2">
-                        <button onClick={() => setEditing(hotel)} className="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 transition-colors"><Pencil size={14} /></button>
-                        <button onClick={() => setDeleting(hotel)} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-colors"><Trash2 size={14} /></button>
-                      </div>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 dark:bg-slate-700/50 text-xs text-slate-500 dark:text-slate-400 uppercase">
+                  <tr>
+                    {['Name', 'Location', 'Category', 'Price (KES)', 'Actions'].map(h => (
+                      <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                  {data.documents.map(hotel => (
+                    <tr key={hotel.$id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                      <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{hotel.name}</td>
+                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{hotel.location}</td>
+                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{hotel.category}</td>
+                      <td className="px-4 py-3 font-medium text-emerald-600 dark:text-emerald-400">{formatCurrency(hotel.startingPrice)}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <button onClick={() => setEditing(hotel)} className="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 transition-colors" aria-label="Edit"><Pencil size={14} /></button>
+                          <button onClick={() => setDeleting(hotel)} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-colors" aria-label="Delete"><Trash2 size={14} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}
@@ -168,7 +171,7 @@ function HotelsTab({ refreshKey, refresh }) {
         </p>
         <div className="flex gap-3">
           <Button variant="secondary" className="flex-1" onClick={() => setDeleting(null)}>Cancel</Button>
-          <Button variant="danger"    className="flex-1" onClick={handleDelete}>Delete</Button>
+          <Button variant="danger"    className="flex-1" onClick={handleDelete} id="confirm-delete-hotel">Delete</Button>
         </div>
       </Modal>
     </div>
@@ -197,11 +200,12 @@ function RoomsTab({ refreshKey, refresh }) {
           value={selectedHotelId}
           onChange={e => setSelectedHotelId(e.target.value)}
           className="text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300"
+          id="room-hotel-select"
         >
           <option value="">— Select a hotel —</option>
           {hotelsData?.documents.map(h => <option key={h.$id} value={h.$id}>{h.name}</option>)}
         </select>
-        {selectedHotelId && <Button icon={Plus} size="sm" onClick={() => setShowAdd(true)}>Add Room</Button>}
+        {selectedHotelId && <Button icon={Plus} size="sm" onClick={() => setShowAdd(true)} id="add-room-btn">Add Room</Button>}
       </div>
 
       {!selectedHotelId ? (
@@ -213,32 +217,34 @@ function RoomsTab({ refreshKey, refresh }) {
           {roomsData?.documents.length === 0 ? (
             <EmptyState icon={BedDouble} title="No rooms" message="Add the first room for this hotel." />
           ) : (
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50 dark:bg-slate-700/50 text-xs text-slate-500 dark:text-slate-400 uppercase">
-                <tr>
-                  {['Type', 'Capacity', 'Price/Night', 'Status', 'Actions'].map(h => (
-                    <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-                {roomsData.documents.map(room => (
-                  <tr key={room.$id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30">
-                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{room.type}</td>
-                    <td className="px-4 py-3 text-slate-500">{room.capacity}</td>
-                    <td className="px-4 py-3 text-gold-600 dark:text-gold-400 font-medium">{formatCurrency(room.pricePerNight)}</td>
-                    <td className="px-4 py-3">
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${room.isAvailable ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400' : 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400'}`}>
-                        {room.isAvailable ? 'Available' : 'Unavailable'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <button onClick={() => setEditing(room)} className="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 transition-colors"><Pencil size={14} /></button>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 dark:bg-slate-700/50 text-xs text-slate-500 dark:text-slate-400 uppercase">
+                  <tr>
+                    {['Type', 'Capacity', 'Price/Night (KES)', 'Status', 'Actions'].map(h => (
+                      <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                  {roomsData.documents.map(room => (
+                    <tr key={room.$id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30">
+                      <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{room.type}</td>
+                      <td className="px-4 py-3 text-slate-500">{room.capacity}</td>
+                      <td className="px-4 py-3 text-emerald-600 dark:text-emerald-400 font-medium">{formatCurrency(room.pricePerNight)}</td>
+                      <td className="px-4 py-3">
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${room.isAvailable ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400' : 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400'}`}>
+                          {room.isAvailable ? 'Available' : 'Unavailable'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button onClick={() => setEditing(room)} className="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 transition-colors" aria-label="Edit"><Pencil size={14} /></button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}
@@ -254,10 +260,17 @@ function BookingsTab({ refreshKey, refresh }) {
   const { data, loading } = useAsync(() => bookingService.getAllBookings({ limit: 100 }), [refreshKey])
 
   return (
-    <div>
-      <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white mb-4">
-        All Bookings ({data?.total ?? 0})
-      </h2>
+    <div className="space-y-4">
+      <div className="flex items-center gap-4">
+        <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white">
+          All Bookings ({data?.total ?? 0})
+        </h2>
+        {data?.documents && data.documents.length > 0 && (
+          <span className="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-3 py-1.5 rounded-full font-medium">
+            Click on a booking to expand details
+          </span>
+        )}
+      </div>
       {loading ? <Skeleton className="h-64 rounded-2xl" /> : (
         <BookingsTable bookings={data?.documents || []} onRefresh={refresh} showAdmin />
       )}
@@ -267,6 +280,37 @@ function BookingsTab({ refreshKey, refresh }) {
 
 // ─── Shared bookings table ────────────────────────────────────────────────────
 function BookingsTable({ bookings, onRefresh, showAdmin }) {
+  const [expandedId, setExpandedId] = useState(null)
+  const [bookingsData, setBookingsData] = useState({})
+  const [loading, setLoading] = useState(false)
+
+  // Fetch user and hotel details for all bookings
+  const loadBookingDetails = async () => {
+    setLoading(true)
+    const data = {}
+    
+    for (const booking of bookings) {
+      if (!data[booking.$id]) {
+        try {
+          // Fetch user details
+          const user = await databases.getDocument(DB_ID, USERS_COL, booking.userId)
+          // Fetch hotel details
+          const hotel = await databases.getDocument(DB_ID, HOTELS_COL, booking.hotelId)
+          // Fetch room details
+          const room = await databases.getDocument(DB_ID, ROOMS_COL, booking.roomId)
+          
+          data[booking.$id] = { user, hotel, room }
+        } catch (err) {
+          console.error(`Error loading details for booking ${booking.$id}:`, err)
+          data[booking.$id] = { user: null, hotel: null, room: null }
+        }
+      }
+    }
+    
+    setBookingsData(data)
+    setLoading(false)
+  }
+
   const handleStatus = async (bookingId, status) => {
     try {
       await bookingService.updateStatus(bookingId, status)
@@ -277,44 +321,175 @@ function BookingsTable({ bookings, onRefresh, showAdmin }) {
     }
   }
 
-  if (bookings.length === 0) return <EmptyState icon={CalendarCheck} title="No bookings" message="Bookings will appear here." />
+  if (bookings.length === 0) {
+    return <EmptyState icon={CalendarCheck} title="No bookings" message="Bookings will appear here." />
+  }
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead className="bg-slate-50 dark:bg-slate-700/50 text-xs text-slate-500 dark:text-slate-400 uppercase">
-          <tr>
-            {['ID', 'Check-in', 'Check-out', 'Guests', 'Total', 'Status', showAdmin && 'Actions'].filter(Boolean).map(h => (
-              <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-          {bookings.map(b => (
-            <tr key={b.$id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
-              <td className="px-4 py-3 font-mono text-xs text-slate-500">#{b.$id.slice(-6).toUpperCase()}</td>
-              <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{formatDate(b.checkInDate)}</td>
-              <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{formatDate(b.checkOutDate)}</td>
-              <td className="px-4 py-3 text-slate-500">{b.guestCount}</td>
-              <td className="px-4 py-3 font-medium text-gold-600 dark:text-gold-400">{formatCurrency(b.totalPrice)}</td>
-              <td className="px-4 py-3"><BookingStatusBadge status={b.status} /></td>
-              {showAdmin && (
-                <td className="px-4 py-3">
-                  <select
-                    value={b.status}
-                    onChange={e => handleStatus(b.$id, e.target.value)}
-                    className="text-xs bg-transparent border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1 text-slate-600 dark:text-slate-400"
+    <div className="space-y-4">
+      {!loading && Object.keys(bookingsData).length === 0 && (
+        <div className="mb-4">
+          <Button onClick={loadBookingDetails} size="sm" className="gap-2">
+            Load Guest Details
+          </Button>
+        </div>
+      )}
+
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50 dark:bg-slate-700/50 text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">
+              <tr>
+                <th className="px-4 py-3 text-left">Guest</th>
+                <th className="px-4 py-3 text-left">Hotel</th>
+                <th className="px-4 py-3 text-left">Room</th>
+                <th className="px-4 py-3 text-left">Check-in</th>
+                <th className="px-4 py-3 text-left">Check-out</th>
+                <th className="px-4 py-3 text-left">Guests</th>
+                <th className="px-4 py-3 text-right">Total (KES)</th>
+                <th className="px-4 py-3 text-left">Status</th>
+                {showAdmin && <th className="px-4 py-3 text-left">Action</th>}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+              {bookings.map(b => {
+                const details = bookingsData[b.$id]
+                const isExpanded = expandedId === b.$id
+
+                return (
+                  <tr 
+                    key={b.$id} 
+                    className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors cursor-pointer"
+                    onClick={() => setExpandedId(isExpanded ? null : b.$id)}
                   >
-                    {['pending', 'confirmed', 'cancelled', 'completed'].map(s => (
-                      <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
-                    ))}
-                  </select>
-                </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                    {/* Guest Info */}
+                    <td className="px-4 py-3">
+                      {loading ? (
+                        <Skeleton className="h-4 w-32" />
+                      ) : (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-medium text-slate-900 dark:text-white">
+                            {details?.user?.name || 'Unknown Guest'}
+                          </span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                            <Mail size={12} />
+                            {details?.user?.email || 'N/A'}
+                          </span>
+                        </div>
+                      )}
+                    </td>
+
+                    {/* Hotel Info */}
+                    <td className="px-4 py-3">
+                      {loading ? (
+                        <Skeleton className="h-4 w-40" />
+                      ) : (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-medium text-slate-900 dark:text-white">
+                            {details?.hotel?.name || 'Unknown Hotel'}
+                          </span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                            {details?.hotel?.location || 'N/A'}
+                          </span>
+                        </div>
+                      )}
+                    </td>
+
+                    {/* Room Info */}
+                    <td className="px-4 py-3">
+                      {loading ? (
+                        <Skeleton className="h-4 w-24" />
+                      ) : (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-medium text-slate-900 dark:text-white">
+                            {details?.room?.type || 'Unknown'}
+                          </span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                            Cap: {details?.room?.capacity || 'N/A'}
+                          </span>
+                        </div>
+                      )}
+                    </td>
+
+                    {/* Dates */}
+                    <td className="px-4 py-3 text-slate-700 dark:text-slate-300 text-sm">
+                      {formatDate(b.checkInDate)}
+                    </td>
+                    <td className="px-4 py-3 text-slate-700 dark:text-slate-300 text-sm">
+                      {formatDate(b.checkOutDate)}
+                    </td>
+
+                    {/* Guests */}
+                    <td className="px-4 py-3 text-slate-500">
+                      <span className="flex items-center gap-1">
+                        <Users size={14} /> {b.guestCount}
+                      </span>
+                    </td>
+
+                    {/* Price */}
+                    <td className="px-4 py-3 font-bold text-emerald-600 dark:text-emerald-400 text-right">
+                      {formatCurrency(b.totalPrice)}
+                    </td>
+
+                    {/* Status */}
+                    <td className="px-4 py-3">
+                      <BookingStatusBadge status={b.status} />
+                    </td>
+
+                    {/* Actions */}
+                    {showAdmin && (
+                      <td className="px-4 py-3">
+                        <select
+                          value={b.status}
+                          onChange={(e) => {
+                            e.stopPropagation()
+                            handleStatus(b.$id, e.target.value)
+                          }}
+                          className="text-xs bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1.5 text-slate-600 dark:text-slate-400 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="confirmed">Confirmed</option>
+                          <option value="completed">Completed</option>
+                          <option value="cancelled">Cancelled</option>
+                        </select>
+                      </td>
+                    )}
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Expanded row for special requests */}
+      {expandedId && bookingsData[expandedId] && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase mb-1">Guest Contact</p>
+              <div className="text-sm text-slate-700 dark:text-slate-300 space-y-1">
+                <p className="font-medium">{bookingsData[expandedId]?.user?.name}</p>
+                <p className="flex items-center gap-2">
+                  <Mail size={14} /> {bookingsData[expandedId]?.user?.email}
+                </p>
+                {bookingsData[expandedId]?.user?.phone && (
+                  <p className="flex items-center gap-2">
+                    <Phone size={14} /> {bookingsData[expandedId].user.phone}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase mb-1">Special Requests</p>
+              <p className="text-sm text-slate-700 dark:text-slate-300">
+                {bookings.find(b => b.$id === expandedId)?.specialRequests || 'No special requests'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

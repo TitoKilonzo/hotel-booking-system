@@ -42,6 +42,7 @@ export default {
       },
       boxShadow: {
         'gold': '0 0 0 2px #f59e0b',
+        'emerald': '0 0 0 2px #10b981',
         'card': '0 4px 24px rgba(0,0,0,0.08)',
         'card-dark': '0 4px 24px rgba(0,0,0,0.4)',
       }

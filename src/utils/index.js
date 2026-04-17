@@ -14,9 +14,9 @@ export const formatDateInput = (date) =>
 export const nightsCount = (checkIn, checkOut) =>
   differenceInDays(new Date(checkOut), new Date(checkIn))
 
-// ─── Currency formatter ───────────────────────────────────────────────────────
-export const formatCurrency = (amount, currency = 'USD') =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount)
+// ─── Currency formatter (KES - Kenya Shillings) ──────────────────────────────
+export const formatCurrency = (amount, currency = 'KES') =>
+  new Intl.NumberFormat('en-KE', { style: 'currency', currency }).format(amount)
 
 // ─── Status colors ────────────────────────────────────────────────────────────
 export const statusConfig = {
@@ -47,3 +47,15 @@ export const starRating = (rating, max = 5) => {
 // ─── Truncate text ────────────────────────────────────────────────────────────
 export const truncate = (text, len = 120) =>
   text?.length > len ? text.slice(0, len) + '…' : text
+
+// ─── Kenyan destinations ──────────────────────────────────────────────────────
+export const KENYAN_DESTINATIONS = [
+  { name: 'Nairobi', tagline: 'The Green City in the Sun', emoji: '🏙️' },
+  { name: 'Mombasa', tagline: 'Coastal Paradise', emoji: '🏖️' },
+  { name: 'Diani Beach', tagline: 'White Sand Haven', emoji: '🌊' },
+  { name: 'Maasai Mara', tagline: 'The Great Migration', emoji: '🦁' },
+  { name: 'Nakuru', tagline: 'Flamingo City', emoji: '🦩' },
+  { name: 'Malindi', tagline: 'Italian Riviera of Africa', emoji: '⛵' },
+  { name: 'Nanyuki', tagline: 'Gateway to Mt. Kenya', emoji: '🏔️' },
+  { name: 'Kisumu', tagline: 'Lakeside Charm', emoji: '🌅' },
+]

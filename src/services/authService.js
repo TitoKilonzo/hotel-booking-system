@@ -1,4 +1,5 @@
 import { account, databases, DB_ID, USERS_COL, ID, USER_ROLES } from '../config/appwrite'
+import { OAuthProvider } from 'appwrite'
 
 // ─── Auth Service ─────────────────────────────────────────────────────────────
 
@@ -26,6 +27,38 @@ export const authService = {
   // Login
   async login(email, password) {
     return account.createEmailPasswordSession(email, password)
+  },
+
+  // Login with Google OAuth
+  loginWithGoogle() {
+    const successUrl = `${window.location.origin}/`
+    const failureUrl = `${window.location.origin}/login`
+    account.createOAuth2Session(OAuthProvider.Google, successUrl, failureUrl)
+  },
+
+  // Ensure user profile exists (for OAuth users who may not have one)
+  async ensureUserProfile(user) {
+    try {
+      const profile = await databases.getDocument(DB_ID, USERS_COL, user.$id)
+      return profile
+    } catch {
+      // Profile doesn't exist, create one for OAuth user
+      try {
+        const profile = await databases.createDocument(DB_ID, USERS_COL, user.$id, {
+          userId: user.$id,
+          name: user.name || 'Guest',
+          email: user.email,
+          role: USER_ROLES.CUSTOMER,
+          createdAt: new Date().toISOString(),
+          avatar: null,
+          phone: null,
+        })
+        return profile
+      } catch (createErr) {
+        console.error('Failed to create profile for OAuth user:', createErr)
+        return null
+      }
+    }
   },
 
   // Logout

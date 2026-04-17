@@ -8,7 +8,7 @@ import { useAsync } from '../hooks'
 import { Button, Spinner, EmptyState } from '../components/common/UI'
 import RoomCard from '../components/hotel/RoomCard'
 import StarRating from '../components/common/StarRating'
-import { formatDateInput, nightsCount } from '../utils'
+import { formatDateInput, nightsCount, formatCurrency } from '../utils'
 
 export default function HotelDetailPage() {
   const { hotelId } = useParams()
@@ -60,12 +60,19 @@ export default function HotelDetailPage() {
   }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Spinner size={36} /></div>
-  if (error || !hotel) return <div className="min-h-screen flex items-center justify-center text-slate-500">Hotel not found.</div>
+  if (error || !hotel) return (
+    <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
+      <span className="text-5xl mb-4">🏨</span>
+      <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-white mb-2">Hotel not found</h2>
+      <p className="text-slate-500 dark:text-slate-400 mb-6">This hotel may have been removed or doesn't exist.</p>
+      <Button onClick={() => navigate('/hotels')}>Browse Hotels</Button>
+    </div>
+  )
 
   const images = hotel.imageIds || []
   const currentImg = images[imgIdx]
     ? hotelService.getImageUrl(images[imgIdx], 1200, 700)
-    : 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200'
+    : hotel.imageUrl || 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200'
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 page-enter">
@@ -78,17 +85,20 @@ export default function HotelDetailPage() {
         {images.length > 1 && (
           <>
             <button onClick={() => setImgIdx(i => (i - 1 + images.length) % images.length)}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-colors">
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-colors"
+              aria-label="Previous image">
               <ChevronLeft size={20} />
             </button>
             <button onClick={() => setImgIdx(i => (i + 1) % images.length)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-colors">
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-colors"
+              aria-label="Next image">
               <ChevronRight size={20} />
             </button>
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
               {images.map((_, i) => (
                 <button key={i} onClick={() => setImgIdx(i)}
-                  className={`w-2 h-2 rounded-full transition-all ${i === imgIdx ? 'bg-white w-5' : 'bg-white/40'}`} />
+                  className={`w-2 h-2 rounded-full transition-all ${i === imgIdx ? 'bg-white w-5' : 'bg-white/40'}`}
+                  aria-label={`Image ${i + 1}`} />
               ))}
             </div>
           </>
@@ -96,7 +106,8 @@ export default function HotelDetailPage() {
 
         {/* Back button */}
         <button onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 flex items-center gap-1.5 text-white text-sm bg-black/30 backdrop-blur-sm rounded-full px-3 py-1.5 hover:bg-black/50 transition-colors">
+          className="absolute top-4 left-4 flex items-center gap-1.5 text-white text-sm bg-black/30 backdrop-blur-sm rounded-full px-3 py-1.5 hover:bg-black/50 transition-colors"
+          id="hotel-back-btn">
           <ChevronLeft size={15} /> Back
         </button>
 
@@ -129,7 +140,7 @@ export default function HotelDetailPage() {
                 <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white mb-4">Amenities</h2>
                 <div className="flex flex-wrap gap-2">
                   {hotel.amenities.map(a => (
-                    <span key={a} className="px-3 py-1.5 bg-gold-50 dark:bg-gold-900/20 text-gold-700 dark:text-gold-400 rounded-full text-sm font-medium border border-gold-200 dark:border-gold-800">
+                    <span key={a} className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 rounded-full text-sm font-medium border border-emerald-200 dark:border-emerald-800">
                       {a}
                     </span>
                   ))}
@@ -141,9 +152,9 @@ export default function HotelDetailPage() {
             <section className="mb-8 bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-5">
               <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white mb-4">Contact & Location</h2>
               <div className="space-y-2.5 text-sm text-slate-600 dark:text-slate-400">
-                {hotel.address  && <div className="flex items-center gap-2"><MapPin size={15} className="text-gold-500 shrink-0" />{hotel.address}</div>}
-                {hotel.phone    && <div className="flex items-center gap-2"><Phone size={15} className="text-gold-500 shrink-0" />{hotel.phone}</div>}
-                {hotel.email    && <div className="flex items-center gap-2"><Mail size={15} className="text-gold-500 shrink-0" />{hotel.email}</div>}
+                {hotel.address  && <div className="flex items-center gap-2"><MapPin size={15} className="text-emerald-500 shrink-0" />{hotel.address}</div>}
+                {hotel.phone    && <div className="flex items-center gap-2"><Phone size={15} className="text-emerald-500 shrink-0" />{hotel.phone}</div>}
+                {hotel.email    && <div className="flex items-center gap-2"><Mail size={15} className="text-emerald-500 shrink-0" />{hotel.email}</div>}
               </div>
             </section>
 
@@ -183,7 +194,7 @@ export default function HotelDetailPage() {
               <div className="mb-5">
                 <span className="text-sm text-slate-400">Starting from</span>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-bold text-gold-600 dark:text-gold-400">${hotel.startingPrice}</span>
+                  <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(hotel.startingPrice)}</span>
                   <span className="text-sm text-slate-400">/night</span>
                 </div>
               </div>
@@ -192,17 +203,17 @@ export default function HotelDetailPage() {
                 <div>
                   <label className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 block flex items-center gap-1"><Calendar size={12} />Check-in</label>
                   <input type="date" value={checkIn} min={today} onChange={e => setCheckIn(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-white" />
+                    className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-white" id="sidebar-checkin" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 block flex items-center gap-1"><Calendar size={12} />Check-out</label>
                   <input type="date" value={checkOut} min={checkIn || today} onChange={e => setCheckOut(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-white" />
+                    className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-white" id="sidebar-checkout" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 block flex items-center gap-1"><Users size={12} />Guests</label>
                   <input type="number" value={guests} min={1} max={10} onChange={e => setGuests(Number(e.target.value))}
-                    className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-white" />
+                    className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-white" id="sidebar-guests" />
                 </div>
               </div>
 
@@ -212,14 +223,14 @@ export default function HotelDetailPage() {
                 </div>
               )}
 
-              <Button className="w-full mb-3" onClick={searchRooms} loading={searching} disabled={nights < 1}>
+              <Button className="w-full mb-3" onClick={searchRooms} loading={searching} disabled={nights < 1} id="check-availability-btn">
                 Check Availability
               </Button>
 
               {selectedRoom && (
-                <div className="mb-3 p-3 bg-gold-50 dark:bg-gold-900/20 rounded-xl border border-gold-200 dark:border-gold-800">
-                  <p className="text-xs text-gold-700 dark:text-gold-400 font-medium">Selected: {selectedRoom.type}</p>
-                  <p className="text-sm font-bold text-gold-600 dark:text-gold-400">${(selectedRoom.pricePerNight * nights).toFixed(0)} total</p>
+                <div className="mb-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                  <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">Selected: {selectedRoom.type}</p>
+                  <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(selectedRoom.pricePerNight * nights)} total</p>
                 </div>
               )}
 
@@ -228,6 +239,7 @@ export default function HotelDetailPage() {
                 className="w-full"
                 disabled={!selectedRoom}
                 onClick={handleBook}
+                id="book-now-btn"
               >
                 {selectedRoom ? 'Book Now' : 'Select a Room First'}
               </Button>

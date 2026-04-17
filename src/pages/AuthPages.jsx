@@ -3,8 +3,8 @@ import { LoginForm, RegisterForm, AuthLayout } from '../components/auth/AuthForm
 export function LoginPage() {
   return (
     <AuthLayout
-      title="Welcome back"
-      subtitle="Sign in to access your bookings and exclusive offers"
+      title="Karibu Tena"
+      subtitle="Sign in to access your bookings and explore Kenya's finest stays"
     >
       <LoginForm />
     </AuthLayout>
@@ -14,8 +14,8 @@ export function LoginPage() {
 export function RegisterPage() {
   return (
     <AuthLayout
-      title="Create your account"
-      subtitle="Join thousands of travellers enjoying premium stays"
+      title="Jiunge Nasi"
+      subtitle="Join thousands of travellers enjoying premium Kenyan hospitality"
     >
       <RegisterForm />
     </AuthLayout>
